@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+/* SmartTrackers brand palette — reusable across the app via bg-brand-*, text-brand-*, etc. */
+@theme {
+  --color-brand-navy: #062b49;
+  --color-brand-navy-light: #0c4e7a;
+  --color-brand-green: #22b24c;
+  --color-brand-green-dark: #1c9a41;
+  --color-brand-cyan: #00bce7;
+}

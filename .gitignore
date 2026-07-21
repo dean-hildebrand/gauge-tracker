@@ -37,6 +37,4 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-# Planning docs — kept local, never committed.
-/SPEC.md
-/PRD.md
+/docs

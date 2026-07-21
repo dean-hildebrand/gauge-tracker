@@ -24,6 +24,12 @@
   </head>
 
   <body>
+    <% if flash.any? { |_, message| message.present? } %>
+      <div class="mx-auto mt-6 flex w-full max-w-3xl flex-col gap-2 px-5">
+        <%= render "shared/flash" %>
+      </div>
+    <% end %>
+
     <main class="container mx-auto mt-28 px-5 flex">
       <%= yield %>
     </main>
