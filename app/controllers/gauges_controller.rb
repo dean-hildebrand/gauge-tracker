@@ -1,0 +1,2 @@
+class GaugesController < ApplicationController
+end
