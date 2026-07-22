@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "period_#{@gauge.id}_#{@reading.period_start.iso8601}",
+      role: "row", class: "flex items-center gap-4 px-5 py-3 border-t border-slate-100 text-sm" do %>
+  <div class="flex-1 font-medium text-brand-navy"><%= period_label(@gauge, @reading.period_start) %></div>
+  <%= render "form", gauge: @gauge, reading: @reading %>
+<% end %>

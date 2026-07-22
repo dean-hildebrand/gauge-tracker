@@ -1,0 +1,20 @@
+<% url = reading.new_record? ? gauge_readings_path(gauge) : reading_path(reading) %>
+
+<%= form_with model: reading, url: url, class: "flex flex-1 items-center gap-3" do |f| %>
+  <%# period_start is fixed for a row; submit it only when creating. %>
+  <% if reading.new_record? %>
+    <%= f.hidden_field :period_start %>
+  <% end %>
+
+  <div class="flex-1">
+    <%= f.number_field :value, step: "any", min: "0", autofocus: true,
+          placeholder: "Value in #{gauge.unit}",
+          class: "w-40 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-brand-green focus:outline-none" %>
+    <% if reading.errors[:value].any? %>
+      <span class="ml-2 text-xs text-red-600"><%= reading.errors[:value].to_sentence %></span>
+    <% end %>
+  </div>
+
+  <%= f.submit "Save", class: "rounded-lg bg-brand-green px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-green-dark" %>
+  <%= link_to "Cancel", gauge_path(gauge), class: "text-sm text-slate-500 hover:underline" %>
+<% end %>
