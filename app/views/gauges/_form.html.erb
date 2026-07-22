@@ -1,4 +1,12 @@
 <%= form_with model: gauge, class: "space-y-5" do |form| %>
+  <% locked = gauge.period_shape_locked %>
+
+  <% if locked %>
+    <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+      This gauge already has readings, so its dates and time unit are locked. You can still rename it or change its unit.
+    </div>
+  <% end %>
+
   <% if gauge.errors.any? %>
     <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
       <p class="font-semibold text-red-800">
@@ -21,14 +29,14 @@
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
     <div>
       <%= form.label :starts_on, "Starts on", class: "block text-sm font-medium text-brand-navy" %>
-      <%= form.date_field :starts_on,
-            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan" %>
+      <%= form.date_field :starts_on, disabled: locked,
+            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan disabled:bg-slate-100 disabled:text-slate-400" %>
     </div>
 
     <div>
       <%= form.label :ends_on, "Ends on", class: "block text-sm font-medium text-brand-navy" %>
-      <%= form.date_field :ends_on,
-            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan" %>
+      <%= form.date_field :ends_on, disabled: locked,
+            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan disabled:bg-slate-100 disabled:text-slate-400" %>
     </div>
   </div>
 
@@ -44,7 +52,8 @@
       <%= form.select :time_unit,
             Gauge.time_units.keys.map { |key| [ key.titleize, key ] },
             {},
-            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan" %>
+            disabled: locked,
+            class: "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-brand-navy shadow-sm focus:border-brand-cyan focus:ring-brand-cyan disabled:bg-slate-100 disabled:text-slate-400" %>
     </div>
   </div>
 

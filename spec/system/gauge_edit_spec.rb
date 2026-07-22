@@ -28,6 +28,20 @@ RSpec.describe "Gauge editing", type: :system do
     expect(gauge.reload.name).to eq("2026 Power")
   end
 
+  it "locks the date and time-unit fields once the gauge has readings" do
+    gauge = create(:gauge, created_by: creator)
+    create(:reading, gauge: gauge, entered_by: creator, period_start: gauge.periods.first.first)
+
+    sign_in_as(creator)
+    visit edit_gauge_path(gauge)
+
+    expect(page).to have_content("its dates and time unit are locked")
+    expect(page).to have_field("Starts on", disabled: true)
+    expect(page).to have_field("Ends on", disabled: true)
+    expect(page).to have_field("Time unit", disabled: true)
+    expect(page).to have_field("Name", disabled: false)
+  end
+
   it "does not show the edit link to a non-creator" do
     gauge = create(:gauge, name: "2026 Electricity", created_by: creator)
 

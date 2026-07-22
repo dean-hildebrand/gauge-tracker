@@ -23,12 +23,12 @@ RSpec.describe "Gauge detail grid", type: :system do
     sign_in_as(employee)
     visit gauge_path(gauge)
 
-    expect(page).to have_css("tbody tr", count: 12)
+    expect(page).to have_css(".period-row", count: 12)
     expect(page).to have_content("January 2026")
     expect(page).to have_content("December 2026")
     expect(page).to have_content("Approved")
     expect(page).to have_content("Pending")
-    expect(page).to have_content("Not entered")
+    expect(page).to have_link("Add reading") # empty periods are actionable in Step 5
   end
 
   it "labels a truncated first period as a date range" do

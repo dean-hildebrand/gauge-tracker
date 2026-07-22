@@ -9,6 +9,12 @@ class Gauge < ApplicationRecord
   validates :unit, presence: true
   validates :starts_on, :ends_on, presence: true
   validate  :ends_on_after_starts_on
+  validate  :period_shape_locked, on: :update
+
+  # True once the gauge has readings: its period shape can no longer be edited.
+  def period_shape_locked
+    persisted? && readings.exists?
+  end
 
   # Calendar-aligned periods, first and last truncated to the gauge range.
   def periods
