@@ -2,6 +2,8 @@ class Gauge < ApplicationRecord
   enum :time_unit, { daily: 0, weekly: 1, monthly: 2, yearly: 3 }
 
   belongs_to :created_by, class_name: "User"
+  # No gauge deletion implemented in UI but would want to avoid leaving orphaned readings if it were.
+  has_many :readings, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 120 }
   validates :unit, presence: true
@@ -22,6 +24,11 @@ class Gauge < ApplicationRecord
     end
 
     result
+  end
+
+  def readings_by_period
+    # Return each period's start date to the corresponding reading, if any.
+    readings.index_by(&:period_start)
   end
 
   private

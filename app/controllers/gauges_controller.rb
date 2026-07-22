@@ -8,6 +8,7 @@ class GaugesController < ApplicationController
 
   def show
     @gauge = Gauge.find(params[:id])
+    @readings_by_period = @gauge.readings_by_period
   end
 
   def new
