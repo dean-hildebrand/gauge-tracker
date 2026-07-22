@@ -4,4 +4,6 @@ class User < ApplicationRecord
   enum :role, { employee: 0, manager: 1 }
 
   validates :name, presence: true
+
+  has_many :gauges, foreign_key: :created_by_id, dependent: :restrict_with_error
 end
