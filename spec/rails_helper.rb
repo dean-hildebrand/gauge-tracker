@@ -44,6 +44,8 @@ Capybara.default_max_wait_time = 5
 
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
+  # sign in helper: eg: before { sign_in manager }
+  config.include Devise::Test::IntegrationHelpers, type: :request
   config.before(:each, type: :system) { driven_by :cuprite }
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
