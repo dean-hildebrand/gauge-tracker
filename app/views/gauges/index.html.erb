@@ -1,4 +1,41 @@
-<div>
-  <%= button_to "Logout", destroy_user_session_path, method: :delete%>
+<% content_for :title, "Gauges — Gauge Tracker" %>
+
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold text-brand-navy">Gauges</h1>
+
+  <% if current_user.employee? %>
+    <%= link_to "New gauge", new_gauge_path,
+          class: "rounded-lg bg-brand-green px-4 py-2 font-semibold text-white transition hover:bg-brand-green-dark" %>
+  <% end %>
 </div>
-<h1>This is the Gauges#index page</h1>
+
+<% if @gauges.any? %>
+  <ul class="mt-6 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white">
+    <% @gauges.each do |gauge| %>
+      <li class="flex items-center justify-between gap-4 px-5 py-4">
+        <div>
+          <p class="font-semibold text-brand-navy"><%= gauge.name %></p>
+          <p class="mt-0.5 text-sm text-slate-500">
+            <%= gauge.starts_on.to_fs(:long) %> – <%= gauge.ends_on.to_fs(:long) %>
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 text-sm">
+          <span class="rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-600">
+            <%= gauge.unit %>
+          </span>
+          <span class="rounded-full bg-brand-cyan/10 px-2.5 py-0.5 font-medium text-brand-navy">
+            <%= gauge.time_unit.titleize %>
+          </span>
+          <span class="text-slate-500">
+            <%= pluralize(gauge.periods.size, "period") %>
+          </span>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="mt-6 rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-500">
+    No gauges yet.
+  </p>
+<% end %>
