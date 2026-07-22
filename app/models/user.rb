@@ -6,4 +6,5 @@ class User < ApplicationRecord
   validates :name, presence: true
 
   has_many :gauges, foreign_key: :created_by_id, dependent: :restrict_with_error
+  has_many :readings, foreign_key: :entered_by_id, dependent: :restrict_with_error
 end
