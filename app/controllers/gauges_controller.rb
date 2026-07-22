@@ -1,6 +1,6 @@
 class GaugesController < ApplicationController
   before_action :require_employee!, only: [ :new, :create, :edit, :update ]
-  before_action :set_owned_gauge, only: [ :show, :edit, :update ]
+  before_action :set_owned_gauge, only: [ :edit, :update ]
 
   def index
     @gauges = Gauge.order(created_at: :desc)
