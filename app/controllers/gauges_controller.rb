@@ -1,6 +1,6 @@
 class GaugesController < ApplicationController
   before_action :require_employee!, only: [ :new, :create, :edit, :update ]
-  before_action :set_owned_gauge, only: [ :edit, :update ]
+  before_action :set_owned_gauge, only: [ :show, :edit, :update ]
 
   def index
     @gauges = Gauge.order(created_at: :desc)
@@ -38,7 +38,10 @@ class GaugesController < ApplicationController
   private
   # Employees can only edit gauges they created.
   def set_owned_gauge
-    @gauge = current_user.gauges.find(params[:id])
+    @gauge = current_user.gauges.find_by(id: params[:id])
+    return if @gauge
+
+    redirect_to root_path, alert: "You can only edit gauges you created."
   end
 
   def gauge_params
