@@ -10,4 +10,14 @@ class ApplicationController < ActionController::Base
   def after_sign_out_path_for(_resource)
     new_user_session_path
   end
+
+  private
+
+  def require_employee!
+    redirect_to root_path, alert: "Only employees can do that." unless current_user.employee?
+  end
+
+  def require_manager!
+    redirect_to root_path, alert: "Only managers can do that." unless current_user.manager?
+  end
 end

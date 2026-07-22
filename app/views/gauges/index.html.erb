@@ -14,7 +14,7 @@
     <% @gauges.each do |gauge| %>
       <li class="flex items-center justify-between gap-4 px-5 py-4">
         <div>
-          <p class="font-semibold text-brand-navy"><%= gauge.name %></p>
+          <p class="font-semibold text-brand-navy"><%= link_to gauge.name, gauge_path(gauge) %></p>
           <p class="mt-0.5 text-sm text-slate-500">
             <%= gauge.starts_on.to_fs(:long) %> – <%= gauge.ends_on.to_fs(:long) %>
           </p>
