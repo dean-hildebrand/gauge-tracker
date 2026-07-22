@@ -1,7 +1,11 @@
 module GaugesHelper
-  # Human readable label for a single period range, chosen by the gauge's time_unit.
-  def period_label(range, time_unit)
-    case time_unit.to_sym
+  # Human readable label for a period.
+  # A Reading only stores period_start, so callers pass that and the range is resolved here.
+  def period_label(gauge, period_start)
+    range = gauge.periods.find { |r| r.first == period_start }
+    return period_start.to_fs(:long) if range.nil?
+
+    case gauge.time_unit.to_sym
     when :daily   then range.first.to_fs(:long)
     when :weekly  then period_range_label(range)
     when :monthly then month_period_label(range)
