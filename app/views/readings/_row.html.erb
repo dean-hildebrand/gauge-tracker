@@ -1,0 +1,41 @@
+<% row_class = "period-row flex items-center gap-4 px-5 py-3 border-t border-slate-100 text-sm" %>
+<%# Only the gauge's creator may add or edit its readings; others see a read-only grid. %>
+<% can_manage = gauge.created_by_id == current_user.id %>
+
+<% if reading&.approved? %>
+  <div role="row" class="<%= row_class %>">
+    <div class="flex-1 font-medium text-brand-navy"><%= period_label(gauge, period_start) %></div>
+    <div class="w-40 text-slate-600">
+      <%= number_with_precision(reading.value, precision: 3, strip_insignificant_zeros: true) %>
+      <span class="text-slate-400"><%= gauge.unit %></span>
+    </div>
+    <div class="w-48">
+      <span class="rounded-full bg-brand-green/10 px-2.5 py-0.5 text-xs font-medium text-brand-green">Approved</span>
+    </div>
+  </div>
+<% else %>
+  <%= turbo_frame_tag "period_#{gauge.id}_#{period_start.iso8601}", role: "row", class: row_class do %>
+    <div class="flex-1 font-medium text-brand-navy"><%= period_label(gauge, period_start) %></div>
+
+    <% if reading %>
+      <div class="w-40 text-slate-600">
+        <%= number_with_precision(reading.value, precision: 3, strip_insignificant_zeros: true) %>
+        <span class="text-slate-400"><%= gauge.unit %></span>
+      </div>
+      <div class="w-48 flex items-center gap-3">
+        <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">Pending</span>
+        <% if can_manage %>
+          <%= link_to "Edit", edit_reading_path(reading), class: "font-medium text-brand-green hover:underline" %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="w-40 text-slate-300">—</div>
+      <div class="w-48">
+        <% if can_manage %>
+          <%= link_to "Add reading", new_gauge_reading_path(gauge, period_start: period_start.iso8601),
+                class: "font-medium text-brand-green hover:underline" %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

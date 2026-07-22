@@ -3,5 +3,8 @@ class Reading < ApplicationRecord
   belongs_to :entered_by,  class_name: "User"
   belongs_to :approved_by, class_name: "User", optional: true
 
+  validates :period_start, presence: true, uniqueness: { scope: :gauge_id }
+  validates :value, presence: true, numericality: { greater_than_or_equal_to: 0 }
+
   def approved? = approved_at.present?
 end
