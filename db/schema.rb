@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_21_162520) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_112313) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,6 +28,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_162520) do
     t.check_constraint "time_unit >= 0 AND time_unit <= 3", name: "gauges_time_unit_range_check"
   end
 
+  create_table "readings", force: :cascade do |t|
+    t.datetime "approved_at"
+    t.bigint "approved_by_id"
+    t.datetime "created_at", null: false
+    t.bigint "entered_by_id", null: false
+    t.bigint "gauge_id", null: false
+    t.date "period_start", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "value", precision: 12, scale: 3, null: false
+    t.index ["approved_at"], name: "index_readings_on_approved_at"
+    t.index ["approved_by_id"], name: "index_readings_on_approved_by_id"
+    t.index ["entered_by_id"], name: "index_readings_on_entered_by_id"
+    t.index ["gauge_id", "period_start"], name: "index_readings_on_gauge_id_and_period_start", unique: true
+    t.index ["gauge_id"], name: "index_readings_on_gauge_id"
+    t.check_constraint "approved_at IS NULL AND approved_by_id IS NULL OR approved_at IS NOT NULL AND approved_by_id IS NOT NULL", name: "readings_approval_pair_check"
+    t.check_constraint "value >= 0::numeric", name: "readings_value_non_negative_check"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -41,4 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_162520) do
   end
 
   add_foreign_key "gauges", "users", column: "created_by_id"
+  add_foreign_key "readings", "gauges", on_delete: :cascade
+  add_foreign_key "readings", "users", column: "approved_by_id"
+  add_foreign_key "readings", "users", column: "entered_by_id"
 end
