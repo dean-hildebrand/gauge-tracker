@@ -51,9 +51,9 @@ System specs via Cuprite (headless Chrome), so Chrome/Chromium must be installed
 
 ## Design decisions
 
-- **The immutability guard is model-level, not just controller-level.** A `before_update` callback keyed off `approved_at_was` aborts any write to an already-approved reading.
+- **The immutability guard is model-level.** `before_update` and `before_destroy` callbacks keyed off `approved_at_was` abort any write to (or deletion of) an already-approved reading.
 - **Periods are derived, not stored.** A gauge's periods are a pure function of its date range and time unit, calendar-aligned with the first and last truncated to fit. No `periods` table to keep in sync when a gauge changes.
-- **`period_start` is the canonical reading key.** `(gauge_id, period_start)` is unique at the database level, avoiding duplicate entry.
+- **`period_start` is the canonical reading key.** `(gauge_id, period_start)` is unique at the database level, avoiding duplicate entry, and a model validation requires it to fall on one of the gauge's period boundaries.
 - **Approval is two nullable columns (`approved_at`, `approved_by_id`), not a status enum** — an enum would need the same columns anyway and would admit an invalid "approved by nobody" state.
 - **Reading entry uses Turbo Frames** (each period row is a turbo_frame_tag); **approval uses Turbo Streams** (one POST replaces the row *and* updates the header counter — two targets, which is why I used streams).
 
@@ -71,7 +71,7 @@ Decided this made the most sense for this type of application (alternative thoug
 ## Guage editing/updating
 
 - **Gauge editing is partially in scope.** 
-- In interest of time, I decided to `lock` a gauge's period *shape* (`starts_on`, `ends_on`, `time_unit`) to avoid complications with existing readings. For a fully fledged app, I would think about converting the existing reading into the appropriate `new` time_unit when editing to avoid mismatching readings based on a particular `time range` and `period`
+- In interest of time, I decided to `lock` a gauge's period *shape* (`starts_on`, `ends_on`, `time_unit`) once it has readings, to avoid complications with existing readings. The lock is a model validation. For a fully fledged app, I would think about converting the existing reading into the appropriate `new` time_unit when editing to avoid mismatching readings based on a particular `time range` and `period`
 
 ## Cut for time
 

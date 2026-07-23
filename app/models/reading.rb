@@ -7,8 +7,10 @@ class Reading < ApplicationRecord
 
   validates :period_start, presence: true, uniqueness: { scope: :gauge_id }
   validates :value, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validate  :period_start_within_gauge
 
-  before_update :guard_immutability
+  before_update  :guard_immutability
+  before_destroy :guard_immutability # prevent console deletion of approved readings - no UI deletion
 
   scope :approved, -> { where.not(approved_at: nil) }
   scope :pending,  -> { where(approved_at: nil) }
@@ -29,5 +31,13 @@ class Reading < ApplicationRecord
 
     errors.add(:base, "Approved readings cannot be modified")
     throw :abort
+  end
+
+  # A reading only makes sense on one of its gauge's period boundaries
+  def period_start_within_gauge
+    return if gauge.blank? || period_start.blank?
+    return if gauge.covers_period?(period_start)
+
+    errors.add(:period_start, "is not a valid period for this gauge")
   end
 end
