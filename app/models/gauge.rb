@@ -9,10 +9,10 @@ class Gauge < ApplicationRecord
   validates :unit, presence: true
   validates :starts_on, :ends_on, presence: true
   validate  :ends_on_after_starts_on
-  validate  :period_shape_locked, on: :update
+  validate  :period_shape_frozen_when_locked, on: :update
 
   # True once the gauge has readings: its period shape can no longer be edited.
-  def period_shape_locked
+  def period_shape_locked?
     persisted? && readings.exists?
   end
 
@@ -30,6 +30,11 @@ class Gauge < ApplicationRecord
     end
 
     result
+  end
+
+  # A date is a valid reading key only if it is the first day of one of this gauge's periods.
+  def covers_period?(date)
+    periods.any? { |range| range.first == date }
   end
 
   def readings_by_period
@@ -54,5 +59,14 @@ class Gauge < ApplicationRecord
     return if starts_on.blank? || ends_on.blank?
 
     errors.add(:ends_on, "must be after the start date") if ends_on <= starts_on
+  end
+
+  def period_shape_frozen_when_locked
+    # check whether locked attrs actually got changed
+    return unless period_shape_locked?
+
+    %i[starts_on ends_on time_unit].each do |attribute|
+      errors.add(attribute, "cannot be changed once the gauge has readings") if attribute_changed?(attribute)
+    end
   end
 end

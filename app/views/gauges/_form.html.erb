@@ -1,5 +1,5 @@
 <%= form_with model: gauge, class: "space-y-5" do |form| %>
-  <% locked = gauge.period_shape_locked %>
+  <% locked = gauge.period_shape_locked? %>
 
   <% if locked %>
     <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">

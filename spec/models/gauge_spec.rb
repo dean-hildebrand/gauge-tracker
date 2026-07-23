@@ -61,6 +61,48 @@ RSpec.describe Gauge, type: :model do
     end
   end
 
+  describe "#covers_period?" do
+    it "accepts only dates that start one of the gauge's periods" do
+      g = gauge(starts_on: Date.new(2026, 3, 14), ends_on: Date.new(2026, 6, 20), time_unit: :monthly)
+
+      expect(g.covers_period?(Date.new(2026, 3, 14))).to be(true)  # truncated head
+      expect(g.covers_period?(Date.new(2026, 4, 1))).to be(true)   # calendar boundary
+      expect(g.covers_period?(Date.new(2026, 4, 15))).to be(false) # mid-period
+      expect(g.covers_period?(Date.new(2026, 7, 1))).to be(false)  # outside the range
+    end
+  end
+
+  describe "period shape lock" do
+    let(:employee) { create(:user, :employee) }
+    let(:locked_gauge) do
+      create(:gauge, created_by: employee).tap do |g|
+        create(:reading, gauge: g, entered_by: employee, period_start: g.periods.first.first)
+      end
+    end
+
+    it "refuses to change starts_on, ends_on, or time_unit once the gauge has readings" do
+      expect(locked_gauge.update(starts_on: Date.new(2026, 2, 1))).to be(false)
+      expect(locked_gauge.errors[:starts_on]).to include("cannot be changed once the gauge has readings")
+
+      locked_gauge.reload
+      expect(locked_gauge.update(ends_on: Date.new(2026, 6, 30))).to be(false)
+
+      locked_gauge.reload
+      expect(locked_gauge.update(time_unit: :daily)).to be(false)
+      expect(locked_gauge.reload.time_unit).to eq("monthly")
+    end
+
+    it "still allows renaming and changing the unit" do
+      expect(locked_gauge.update(name: "Renamed", unit: "MWh")).to be(true)
+    end
+
+    it "allows shape changes while the gauge has no readings" do
+      g = create(:gauge, created_by: employee)
+
+      expect(g.update(time_unit: :weekly, ends_on: Date.new(2026, 6, 30))).to be(true)
+    end
+  end
+
   describe "validations" do
     it "requires a name" do
       expect(build(:gauge, name: nil)).not_to be_valid
