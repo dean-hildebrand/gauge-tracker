@@ -46,5 +46,31 @@ RSpec.describe Reading, type: :model do
       expect(r.reload.value).to eq(10)
       expect(r.errors[:base]).to include("Approved readings cannot be modified")
     end
+
+    it "refuses to destroy an approved reading" do
+      r = reading
+      r.approve!(manager)
+
+      expect(r.destroy).to be(false)
+      expect(Reading.exists?(r.id)).to be(true)
+      expect(r.errors[:base]).to include("Approved readings cannot be modified")
+    end
+  end
+
+  describe "period grid validation" do
+    it "rejects a period_start that is not on the gauge's period grid" do
+      r = build(:reading, gauge: gauge, entered_by: employee, period_start: Date.new(2026, 6, 15))
+
+      expect(r).not_to be_valid
+      expect(r.errors[:period_start]).to include("is not a valid period for this gauge")
+    end
+
+    it "rejects a duplicate period on the same gauge" do
+      reading(period_start: Date.new(2026, 2, 1))
+
+      duplicate = build(:reading, gauge: gauge, entered_by: employee, period_start: Date.new(2026, 2, 1))
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:period_start]).to include("has already been taken")
+    end
   end
 end
