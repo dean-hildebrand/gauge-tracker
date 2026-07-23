@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "period_#{@gauge.id}_#{@reading.period_start.iso8601}" do %>
+  <%= render "readings/row", gauge: @gauge, period_start: @reading.period_start, reading: @reading %>
+<% end %>
+
+<%= turbo_stream.update "approval_counter_#{@gauge.id}" do %>
+  <%= @gauge.approved_count %> of <%= @gauge.periods.size %> approved
+<% end %>

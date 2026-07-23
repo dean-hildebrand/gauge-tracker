@@ -37,6 +37,8 @@ class Gauge < ApplicationRecord
     readings.index_by(&:period_start)
   end
 
+  def approved_count = readings.approved.count
+
   private
 
   def period_boundary_after(date)
