@@ -23,14 +23,31 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="bg-slate-50 text-slate-900">
+    <% if user_signed_in? %>
+      <header class="border-b border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
+          <%= link_to "Gauge Tracker", root_path, class: "text-lg font-bold tracking-tight text-brand-navy" %>
+
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-slate-700"><%= current_user.name %></span>
+            <span class="rounded-full bg-brand-navy/10 px-2.5 py-0.5 text-xs font-semibold text-brand-navy">
+              <%= current_user.role.titleize %>
+            </span>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete,
+                  class: "cursor-pointer rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100" %>
+          </div>
+        </div>
+      </header>
+    <% end %>
+
     <% if flash.any? { |_, message| message.present? } %>
-      <div class="mx-auto mt-6 flex w-full max-w-3xl flex-col gap-2 px-5">
+      <div class="mx-auto mt-6 flex w-full max-w-5xl flex-col gap-2 px-5">
         <%= render "shared/flash" %>
       </div>
     <% end %>
 
-    <main class="container mx-auto mt-28 px-5 flex">
+    <main class="mx-auto mt-8 max-w-5xl px-5">
       <%= yield %>
     </main>
   </body>
