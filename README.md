@@ -68,7 +68,7 @@ Reading management is further scoped by **gauge ownership**: only the employee w
 
 Decided this made the most sense for this type of application (alternative thought was to only allow `employees` to only see the gauges that they created - out of scope)
 
-## Guage editing/updating
+## Gauge editing/updating
 
 - **Gauge editing is partially in scope.** 
 - In interest of time, I decided to `lock` a gauge's period *shape* (`starts_on`, `ends_on`, `time_unit`) once it has readings, to avoid complications with existing readings. The lock is a model validation. For a fully fledged app, I would think about converting the existing reading into the appropriate `new` time_unit when editing to avoid mismatching readings based on a particular `time range` and `period`
