@@ -1,8 +1,9 @@
 class ReadingsController < ApplicationController
-  before_action :require_employee!
+  before_action :require_employee!, except: [ :approve ]
+  before_action :require_manager!,  only:   [ :approve ]
   before_action :set_gauge,   only: [ :new, :create ]
-  before_action :set_reading, only: [ :edit, :update ]
-  before_action :require_gauge_owner!
+  before_action :set_reading, only: [ :edit, :update, :approve ]
+  before_action :require_gauge_owner!, except: [ :approve ]
 
   def new
     @reading = @gauge.readings.new(period_start: params[:period_start])
@@ -27,6 +28,17 @@ class ReadingsController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def approve
+    @reading.approve!(current_user)
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to @gauge, notice: "Reading approved." }
+    end
+  rescue Reading::ImmutableError
+    redirect_to @gauge, alert: "That reading was already approved."
   end
 
   private

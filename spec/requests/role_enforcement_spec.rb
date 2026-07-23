@@ -35,6 +35,20 @@ RSpec.describe "Role and ownership enforcement", type: :request do
     end
   end
 
+  describe "an employee trying to approve" do
+    before { sign_in employee }
+
+    it "cannot approve a reading" do
+      reading = create(:reading, gauge: gauge, entered_by: employee, value: 10)
+
+      patch approve_reading_path(reading)
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:alert]).to eq("Only managers can do that.")
+      expect(reading.reload).not_to be_approved
+    end
+  end
+
   describe "an employee acting on a gauge they did not create" do
     before { sign_in other }
 

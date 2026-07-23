@@ -1,6 +1,7 @@
 <% row_class = "period-row flex items-center gap-4 px-5 py-3 border-t border-slate-100 text-sm" %>
 <%# Only the gauge's creator may add or edit its readings; others see a read-only grid. %>
 <% can_manage = gauge.created_by_id == current_user.id %>
+<% can_approve = current_user.manager? %>
 
 <% if reading&.approved? %>
   <div role="row" class="<%= row_class %>">
@@ -11,6 +12,9 @@
     </div>
     <div class="w-48">
       <span class="rounded-full bg-brand-green/10 px-2.5 py-0.5 text-xs font-medium text-brand-green">Approved</span>
+      <span class="ml-1 text-xs text-slate-400">
+        <%= reading.approved_at.to_fs(:long) %> by <%= reading.approved_by.name %>
+      </span>
     </div>
   </div>
 <% else %>
@@ -26,6 +30,10 @@
         <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">Pending</span>
         <% if can_manage %>
           <%= link_to "Edit", edit_reading_path(reading), class: "font-medium text-brand-green hover:underline" %>
+        <% end %>
+        <% if can_approve %>
+          <%= button_to "Approve", approve_reading_path(reading), method: :patch,
+                class: "font-medium text-brand-green hover:underline" %>
         <% end %>
       </div>
     <% else %>
