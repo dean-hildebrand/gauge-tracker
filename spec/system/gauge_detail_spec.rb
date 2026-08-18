@@ -23,12 +23,17 @@ RSpec.describe "Gauge detail grid", type: :system do
     sign_in_as(employee)
     visit gauge_path(gauge)
 
-    expect(page).to have_css(".period-row", count: 12)
+    # 12 monthly periods paginate 10 to a page.
+    expect(page).to have_css(".period-row", count: 10)
     expect(page).to have_content("January 2026")
-    expect(page).to have_content("December 2026")
     expect(page).to have_content("Approved")
     expect(page).to have_content("Pending")
     expect(page).to have_link("Add reading") # empty periods are actionable in Step 5
+
+    within("nav.pagy") { click_link "2" }
+
+    expect(page).to have_css(".period-row", count: 2)
+    expect(page).to have_content("December 2026")
   end
 
   it "labels a truncated first period as a date range" do

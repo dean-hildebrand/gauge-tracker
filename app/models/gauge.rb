@@ -42,7 +42,9 @@ class Gauge < ApplicationRecord
     readings.index_by(&:period_start)
   end
 
-  def approved_count = readings.approved.count
+  def approved_count
+    readings.approved.count
+  end
 
   private
 

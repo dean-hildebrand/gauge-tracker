@@ -1,15 +1,20 @@
 class GaugesController < ApplicationController
   before_action :require_employee!, only: [ :new, :create, :edit, :update ]
   before_action :set_owned_gauge, only: [ :edit, :update ]
-
+  include Pagy::Method
   def index
     @gauges = Gauge.order(created_at: :desc)
+    @pagy, @gauges = pagy(:countish, @gauges, limit: 10, page: params[:page])
   end
 
   def show
-    @gauge = Gauge.find(params[:id])
-    @readings_by_period = @gauge.readings_by_period
-  end
+  @gauge = Gauge.find(params[:id])
+  @pagy, @periods = pagy(:offset, @gauge.periods, limit: 10, page: params[:page])
+
+  @readings_by_period = @gauge.readings
+                              .where(period_start: @periods.map(&:first))
+                              .index_by(&:period_start)
+end
 
   def new
     @gauge = Gauge.new(unit: "kWh", time_unit: :monthly)

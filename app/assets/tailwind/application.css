@@ -8,3 +8,30 @@
   --color-brand-green-dark: #1c9a41;
   --color-brand-cyan: #00bce7;
 }
+
+/* Pagy's series_nav markup comes from the gem, so Tailwind's scanner never sees it.
+   Styled here to match the pill/card treatment used elsewhere in the app. */
+.pagy.series-nav {
+  @apply mt-6 flex items-center justify-center gap-1.5 text-sm font-medium;
+}
+
+.pagy.series-nav a {
+  @apply inline-flex min-w-9 items-center justify-center rounded-lg border border-slate-200
+         bg-white px-3 py-1.5 text-slate-600 no-underline transition
+         hover:border-brand-green hover:text-brand-green;
+}
+
+/* Current page. */
+.pagy.series-nav a[aria-current="page"] {
+  @apply pointer-events-none border-brand-green bg-brand-green text-white;
+}
+
+/* Previous/Next when there is nowhere to go. */
+.pagy.series-nav a[aria-disabled="true"]:not([aria-current="page"]) {
+  @apply pointer-events-none border-slate-100 text-slate-300;
+}
+
+/* The "…" between page ranges — reads as a label, not a button. */
+.pagy.series-nav a[role="separator"] {
+  @apply min-w-0 border-transparent bg-transparent px-1 text-slate-400;
+}
