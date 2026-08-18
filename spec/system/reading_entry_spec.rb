@@ -73,6 +73,45 @@ RSpec.describe "Reading entry", type: :system do
     expect(gauge.readings).to be_empty
   end
 
+  # A manager can approve while the employee sits on a stale page: both the Edit
+  # link and an open edit form must fail loudly and redraw the row.
+  it "refuses an edit click on a row approved since the page was rendered" do
+    reading = create(:reading, gauge: gauge, entered_by: employee,
+                               period_start: Date.new(2026, 4, 1), value: 50)
+    sign_in_as(employee)
+    visit gauge_path(gauge)
+
+    reading.approve!(manager)
+
+    within(period_frame(Date.new(2026, 4, 1))) { click_link "Edit" }
+
+    expect(page).to have_content("That reading was already approved and can no longer be edited.")
+    expect(page).to have_content("Approved")
+    expect(page).to have_no_selector(period_frame(Date.new(2026, 4, 1)))
+    expect(page).to have_content("1 of 12 approved")
+  end
+
+  it "refuses a save when the reading is approved mid-edit" do
+    reading = create(:reading, gauge: gauge, entered_by: employee,
+                               period_start: Date.new(2026, 4, 1), value: 50)
+    sign_in_as(employee)
+    visit gauge_path(gauge)
+
+    within period_frame(Date.new(2026, 4, 1)) do
+      click_link "Edit"
+      fill_in "reading_value", with: "75"
+    end
+
+    reading.approve!(manager)
+
+    within(period_frame(Date.new(2026, 4, 1))) { click_button "Save" }
+
+    expect(page).to have_content("That reading was already approved and can no longer be edited.")
+    expect(page).to have_content("Approved")
+    expect(page).to have_no_button("Save")
+    expect(reading.reload.value).to eq(50)
+  end
+
   it "shows an employee read-only rows on a gauge they did not create" do
     create(:reading, gauge: gauge, entered_by: employee, period_start: Date.new(2026, 5, 1), value: 10)
     sign_in_as(other)
