@@ -4,6 +4,7 @@ class ReadingsController < ApplicationController
   before_action :set_gauge,   only: [ :new, :create ]
   before_action :set_reading, only: [ :edit, :update, :approve ]
   before_action :require_gauge_owner!, except: [ :approve ]
+  before_action :reject_approved!, only: [ :edit, :update ]
 
   def new
     @reading = @gauge.readings.new(period_start: params[:period_start])
@@ -11,7 +12,6 @@ class ReadingsController < ApplicationController
 
   def create
     @reading = @gauge.readings.new(reading_params.merge(entered_by: current_user))
-
     if @reading.save
       render_row
     else
@@ -48,8 +48,21 @@ class ReadingsController < ApplicationController
   end
 
   def set_reading
-    @reading = Reading.find_by(id: params[:id])
+    @reading = Reading.find(params[:id])
     @gauge = @reading&.gauge
+  end
+
+  # A manager can approve between the page render and the employee's click
+  # # prevent the employee from editing an already-approved reading.
+  def reject_approved!
+    return unless @reading.approved?
+
+    flash.now[:alert] = "That reading was already approved and can no longer be edited."
+
+    respond_to do |format|
+      format.turbo_stream { render :immutable, status: :unprocessable_entity }
+      format.html { redirect_to @gauge, alert: "That reading was already approved." }
+    end
   end
 
   # Only the employee who created the gauge may add or edit its readings.

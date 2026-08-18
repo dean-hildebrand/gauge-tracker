@@ -25,7 +25,7 @@
     <%= pluralize(@gauge.periods.size, "period") %>
   </span>
   <span id="approval_counter_<%= @gauge.id %>" class="rounded-full bg-brand-green/10 px-2.5 py-0.5 font-medium text-brand-green">
-    <%= @gauge.approved_count %> of <%= @gauge.periods.size %> approved
+    <%= render "gauges/approval_counter", gauge: @gauge %>
   </span>
 </div>
 

@@ -10,8 +10,9 @@
     <%= f.number_field :value, step: "any", min: "0", autofocus: true,
           placeholder: "Value in #{gauge.unit}",
           class: "w-40 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-brand-green focus:outline-none" %>
-    <% if reading.errors[:value].any? %>
-      <span class="ml-2 text-xs text-red-600"><%= reading.errors[:value].to_sentence %></span>
+    <% errors = reading.errors[:base] + reading.errors[:value] %>
+    <% if errors.any? %>
+      <span class="ml-2 text-xs text-red-600"><%= errors.to_sentence %></span>
     <% end %>
   </div>
 

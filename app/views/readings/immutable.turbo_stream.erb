@@ -1,5 +1,10 @@
+<%# The row the user acted on is stale: swap it for its approved (frameless) state. %>
 <%= turbo_stream.replace "period_#{@gauge.id}_#{@reading.period_start.iso8601}" do %>
   <%= render "readings/row", gauge: @gauge, period_start: @reading.period_start, reading: @reading %>
+<% end %>
+
+<%= turbo_stream.update "flash" do %>
+  <%= render "shared/flash" %>
 <% end %>
 
 <%= turbo_stream.update "approval_counter_#{@gauge.id}" do %>

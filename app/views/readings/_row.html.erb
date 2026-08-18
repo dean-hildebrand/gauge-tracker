@@ -29,7 +29,10 @@
       <div class="w-48 flex items-center gap-3">
         <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">Pending</span>
         <% if can_manage %>
-          <%= link_to "Edit", edit_reading_path(reading), class: "font-medium text-brand-green hover:underline" %>
+          <%# data-turbo-stream: this row may be stale (approved since render), and Turbo
+              only accepts a Stream response to a GET when the link opts in. %>
+          <%= link_to "Edit", edit_reading_path(reading), data: { turbo_stream: true },
+                class: "font-medium text-brand-green hover:underline" %>
         <% end %>
         <% if can_approve %>
           <%= button_to "Approve", approve_reading_path(reading), method: :patch,

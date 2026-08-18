@@ -41,11 +41,7 @@
       </header>
     <% end %>
 
-    <% if flash.any? { |_, message| message.present? } %>
-      <div class="mx-auto mt-6 flex w-full max-w-5xl flex-col gap-2 px-5">
-        <%= render "shared/flash" %>
-      </div>
-    <% end %>
+    <div id="flash"><%= render "shared/flash" %></div>
 
     <main class="mx-auto mt-8 max-w-5xl px-5">
       <%= yield %>
